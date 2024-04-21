@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 // export default function App() {
 //   const [count1, setCount1] = useState(1);
@@ -22,54 +22,54 @@ import { useRef, useState } from "react";
 //   );
 // }
 
-export default function App() {
-  const [count, setCount] = useState(0);
-  const [isCounting, setIsCounting] = useState(false);
-  const intervalRef = useRef<number | undefined>();
-  const previousCountRef = useRef<number | undefined>();
+// export default function App(): JSX.Element {
+//   const [count, setCount] = useState(0);
+//   const [isCounting, setIsCounting] = useState(false);
+//   const intervalRef = useRef<number | undefined>();
+//   const previousCountRef = useRef<number | undefined>();
 
-  // useEffect(() => {
-  //   previousCountRef.current = count;
-  // }, [count]);
+//   // useEffect(() => {
+//   //   previousCountRef.current = count;
+//   // }, [count]);
 
-  const startCounting = () => {
-    setIsCounting(true);
+//   const startCounting = () => {
+//     setIsCounting(true);
 
-    intervalRef.current = setInterval(() => {
-      setCount((prevCount) => {
-        previousCountRef.current = prevCount;
-        return prevCount + 1;
-      });
-    }, 1000);
-  };
+//     intervalRef.current = setInterval(() => {
+//       setCount((prevCount) => {
+//         previousCountRef.current = prevCount;
+//         return prevCount + 1;
+//       });
+//     }, 1000);
+//   };
 
-  const stopCounting = () => {
-    setIsCounting(false);
-    clearInterval(intervalRef.current);
-  };
+//   const stopCounting = () => {
+//     setIsCounting(false);
+//     clearInterval(intervalRef.current);
+//   };
 
-  const resetCount = () => {
-    setCount(0);
-    setIsCounting(false);
-    clearInterval(intervalRef.current);
-  };
+//   const resetCount = () => {
+//     setCount(0);
+//     setIsCounting(false);
+//     clearInterval(intervalRef.current);
+//   };
 
-  console.log({ count, ref: previousCountRef.current });
+//   console.log({ count, ref: previousCountRef.current });
 
-  return (
-    <div>
-      <p>Current Count: {count}</p>
-      <p>Previous Count: {previousCountRef.current}</p>
-      <p>Status: {isCounting ? "Counting" : "Stopped"}</p>
-      <button onClick={isCounting ? stopCounting : startCounting}>
-        {isCounting ? "Stop Counting" : "Start Counting"}
-      </button>
-      <button onClick={resetCount}>Reset Count</button>
-    </div>
-  );
-}
+//   return (
+//     <div>
+//       <p>Current Count: {count}</p>
+//       <p>Previous Count: {previousCountRef.current}</p>
+//       <p>Status: {isCounting ? "Counting" : "Stopped"}</p>
+//       <button onClick={isCounting ? stopCounting : startCounting}>
+//         {isCounting ? "Stop Counting" : "Start Counting"}
+//       </button>
+//       <button onClick={resetCount}>Reset Count</button>
+//     </div>
+//   );
+// }
 
-// export default function App() {
+// export default function App(): JSX.Element {
 //   const [count, setCount] = useState(0);
 
 //   const handleClickButton = () => {
@@ -83,3 +83,37 @@ export default function App() {
 
 //   return <button onClick={handleClickButton}>{count}</button>;
 // }
+
+const debounce = (callback: (text: string) => void, delay: number) => {
+  let timeout: number | undefined;
+
+  return (text: string) => {
+    if (timeout) clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+      callback(text);
+    }, delay);
+  };
+};
+
+const apiCall = debounce((text) => {
+  console.log("API calling....", text);
+}, 1000);
+
+export default function App(): JSX.Element {
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    if (text) apiCall(text);
+  }, [text]);
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={text}
+        onChange={(event) => setText(event.target.value)}
+      />
+    </div>
+  );
+}
